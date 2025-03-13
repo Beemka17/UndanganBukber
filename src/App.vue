@@ -1,85 +1,46 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, onMounted } from 'vue'
+
+const namaTamu = ref('Tamu Undangan')
+
+onMounted(() => {
+  const params = new URLSearchParams(window.location.search)
+  const nama = params.get('to')
+  if (nama) {
+    namaTamu.value = decodeURIComponent(nama)
+  }
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+  <div class="min-h-screen w-full bg-gray-100 text-gray-900">
+    <!-- Halaman Awal -->
+    <section
+      class="flex flex-col items-center justify-center h-screen bg-blue-500 text-white text-center p-6"
+    >
+      <h1 class="text-4xl font-bold">Undangan Buka Bersama</h1>
+      <p class="text-xl mt-2">Untuk: {{ namaTamu }}</p>
+    </section>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <!-- Informasi Acara -->
+    <section class="py-12 px-6 text-center bg-white">
+      <h2 class="text-3xl font-semibold mb-4">Detail Acara</h2>
+      <p class="text-lg">📍 Tempat: Anven</p>
+      <p class="text-lg">🕒 Waktu: Tanggal 22</p>
+    </section>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
+    <!-- Konfirmasi Kehadiran -->
+    <section class="py-12 px-6 text-center bg-gray-100">
+      <h2 class="text-3xl font-semibold mb-4">Konfirmasi Kehadiran</h2>
+      <button class="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md mr-4">Hadir</button>
+      <button class="bg-red-500 text-white px-6 py-2 rounded-lg shadow-md">Tidak Hadir</button>
+    </section>
 
-  <RouterView />
+    <!-- Informasi Pembayaran -->
+    <section class="py-12 px-6 text-center bg-white">
+      <h2 class="text-3xl font-semibold mb-4">Informasi Pembayaran</h2>
+      <p class="text-lg">💰 HTM: Rp 60.000</p>
+      <p class="text-lg">📌 Transfer ke: 111111 atas nama ABCDE</p>
+    </section>
+  </div>
 </template>
-
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
