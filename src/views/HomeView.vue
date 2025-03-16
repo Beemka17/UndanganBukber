@@ -1,16 +1,15 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import { defineAsyncComponent } from 'vue'
-const Payment = defineAsyncComponent(() => import('../views/Payment.vue'))
 import Opening from './Opening.vue'
 import Landing from './Landing.vue'
 import Ornamen from '@/components/Ornamen.vue'
 import Rundown from './Rundown.vue'
 import Divider from '@/components/Divider.vue'
-const Tempat = defineAsyncComponent(() => import('./Tempat.vue'))
-const Dresscode = defineAsyncComponent(() => import('./Dresscode.vue'))
-const Gallery = defineAsyncComponent(() => import('./Gallery.vue'))
-const Closing = defineAsyncComponent(() => import('./Closing.vue'))
+import Tempat from '../views/Tempat.vue'
+import Dresscode from '../views/Dresscode.vue'
+import Payment from '../views/Payment.vue'
+import Gallery from '../views/Gallery.vue'
+import Closing from './Closing.vue'
 import musik from '../assets/audio/backsong.mp3'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
