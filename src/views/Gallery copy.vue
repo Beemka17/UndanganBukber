@@ -55,9 +55,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import bgImage from '../assets/images/WP-WHITE.jpg'
 import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'REMOVED'
-const REMOVED =
-  'REMOVED'
+const supabaseUrl = ''
+const REMOVED = ''
 const supabase = createClient(supabaseUrl, REMOVED)
 
 const selectedFile = ref(null)

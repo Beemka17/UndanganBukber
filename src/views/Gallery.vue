@@ -94,9 +94,8 @@ import fallbackImage2 from '../assets/images/fallback2.jpg'
 import { createClient } from '@supabase/supabase-js'
 
 // Inisialisasi Supabase client (ganti dengan konfigurasi Anda)
-const supabaseUrl = 'REMOVED'
-const REMOVED =
-  'REMOVED'
+const supabaseUrl = ''
+const REMOVED = ''
 const supabase = createClient(supabaseUrl, REMOVED)
 
 // State untuk menyimpan data gambar
