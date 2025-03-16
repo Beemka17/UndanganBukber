@@ -1,8 +1,29 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import Payment from '../views/Payment.vue'
+import Opening from './Opening.vue'
+import Landing from './Landing.vue'
+import Ornamen from '@/components/Ornamen.vue'
+import Rundown from './Rundown.vue'
+import Divider from '@/components/Divider.vue'
+import Tempat from './Tempat.vue'
+import Dresscode from './Dresscode.vue'
+import Gallery from './Gallery.vue'
+import Closing from './Closing.vue'
+import musik from '../assets/audio/backsong1.mp3'
+
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faCompactDisc, faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faCompactDisc, faPlay, faPause)
 
 const namaTamu = ref('Tamu Undangan')
+const showOpening = ref(true)
+const showLanding = ref(false) // Landing.vue belum muncul sampai Opening.vue selesai
+let audio = null
+let isMusicPlaying = false
+const isPlaying = ref(false)
 
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
@@ -11,40 +32,130 @@ onMounted(() => {
     namaTamu.value = decodeURIComponent(nama)
   }
 })
+
+const hideOpening = () => {
+  showOpening.value = false
+
+  // Tunda tampilan Landing.vue selama 600ms agar animasi berjalan mulus
+  setTimeout(() => {
+    showLanding.value = true
+
+    // **Mulai musik setelah Opening.vue selesai**
+    startMusic()
+  }, 600)
+}
+
+const startMusic = () => {
+  if (!audio) {
+    audio = new Audio(musik)
+    audio.loop = true
+  }
+  audio
+    .play()
+    .then(() => {
+      isPlaying.value = true
+    })
+    .catch((err) => console.error('Autoplay failed:', err))
+}
+
+const toggleMusic = () => {
+  if (audio) {
+    if (isPlaying.value) {
+      audio.pause()
+    } else {
+      audio.play()
+    }
+    isPlaying.value = !isPlaying.value
+  }
+}
 </script>
 
 <template>
-  <div class="min-h-screen w-full bg-gray-100 text-gray-900">
-    <!-- Halaman Awal -->
-    <section
-      class="flex flex-col items-center justify-center h-screen bg-blue-500 text-white text-center p-6"
-    >
-      <h1 class="text-4xl font-bold">Undangan Buka Bersama</h1>
-      <p class="text-xl mt-2">Untuk: {{ namaTamu }}</p>
-    </section>
+  <Ornamen />
 
-    <!-- Informasi Acara -->
-    <section class="py-12 px-6 text-center bg-white">
-      <h2 class="text-3xl font-semibold mb-4">Detail Acara</h2>
-      <p class="text-lg">📍 Tempat: Anven</p>
-      <p class="text-lg">🕒 Waktu: Tanggal 22</p>
-    </section>
+  <!-- Transisi untuk efek slide up -->
+  <transition name="slide-up">
+    <Opening v-if="showOpening" @close="hideOpening" />
+  </transition>
 
-    <!-- Konfirmasi Kehadiran -->
-    <section class="py-12 px-6 text-center bg-gray-100">
-      <h2 class="text-3xl font-semibold mb-4">Konfirmasi Kehadiran</h2>
-      <button class="bg-green-500 text-white px-6 py-2 rounded-lg shadow-md mr-4">Hadir</button>
-      <button class="bg-red-500 text-white px-6 py-2 rounded-lg shadow-md">Tidak Hadir</button>
-    </section>
+  <transition class="animate-fade-in animate-delay-250">
+    <Landing v-if="showLanding" />
+  </transition>
 
-    <!-- Informasi Pembayaran -->
-    <section class="py-12 px-6 text-center bg-white">
-      <h2 class="text-3xl font-semibold mb-4">Informasi Pembayaran</h2>
-      <p class="text-lg">💰 HTM: Rp 60.000</p>
-      <p class="text-lg">📌 Transfer ke: 111111 atas nama ABCDE</p>
-    </section>
+  <Divider />
 
-    <!-- Menampilkan Payment -->
-    <Payment />
-  </div>
+  <Rundown />
+
+  <Divider />
+
+  <Tempat />
+
+  <Divider />
+
+  <Dresscode />
+
+  <Divider />
+
+  <Payment />
+
+  <Divider />
+
+  <Gallery />
+
+  <Divider />
+
+  <Closing />
+
+  <!-- 🎵 Tombol Musik -->
+  <button
+    v-if="!showOpening"
+    @click="toggleMusic"
+    class="fixed bottom-6 right-6 w-14 h-14 bg-amber-400 shadow-lg rounded-full flex items-center justify-center z-10"
+  >
+    <div :class="{ 'animate-spin-slow': isPlaying }">
+      <FontAwesomeIcon :icon="['fas', 'compact-disc']" class="w-14 h-14 text-green-900" />
+    </div>
+    <FontAwesomeIcon
+      v-if="!isPlaying"
+      :icon="['fas', 'play']"
+      class="absolute text-green-900 w-14 h-14"
+    />
+    <FontAwesomeIcon
+      v-if="isPlaying"
+      :icon="['fas', 'pause']"
+      class="absolute text-green-900 w-14 h-14"
+    />
+  </button>
 </template>
+
+<style>
+/* Animasi Slide Up */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition:
+    transform 0.6s ease-in-out,
+    opacity 1s ease-in-out;
+}
+
+.slide-up-enter-from,
+.slide-up-leave-to {
+  transform: translateY(-100%);
+  opacity: 1;
+}
+
+.slide-up-leave-from {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Animasi CD Berputar */
+@keyframes spin-slow {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 5s linear infinite;
+}
+</style>

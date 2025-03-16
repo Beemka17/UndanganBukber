@@ -1,2 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:ital,wght@0,500;0,600;0,900;1,500;1,600;1,900&display=swap');
+
 @import './base.css';
 @import 'tailwindcss';
+@import 'flowbite/src/themes/default';
+@plugin "daisyui";
+@plugin '@midudev/tailwind-animations';
+@plugin "flowbite/plugin";
+@source "../node_modules/flowbite";
+
+@theme {
+  --font-family-sans: 'Montserrat', sans-serif;
+  --font-family-serif: 'Cinzel Decorative', serif;
+  --color-primary: #fec200;
+  --color-secondary: #185d4e;
+}

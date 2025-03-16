@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Payment from '@/views/Payment.vue'
 import Warning from '@/views/Warning.vue'
+import Opening from '@/views/Opening.vue'
+import Landing from '@/views/Landing.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,6 +28,14 @@ const router = createRouter({
     {
       path: '/warning',
       component: Warning,
+    },
+    {
+      path: '/opening',
+      component: Opening,
+    },
+    {
+      path: '/landing',
+      component: Landing,
     },
   ],
 })

@@ -3,7 +3,7 @@ import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const isMobile = ref(window.innerWidth < 1024)
+const isMobile = ref(window.innerWidth < 600)
 
 // Cek ukuran layar saat pertama kali dimuat
 onMounted(() => {
@@ -19,7 +19,7 @@ onUnmounted(() => {
 
 // Fungsi untuk mendeteksi perubahan ukuran layar
 function handleResize() {
-  isMobile.value = window.innerWidth < 1024
+  isMobile.value = window.innerWidth < 600
 }
 
 // Pantau perubahan `isMobile` secara real-time
