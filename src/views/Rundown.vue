@@ -24,8 +24,8 @@
             </svg>
           </div>
           <div class="timeline-start mb-10 md:text-end">
-            <time class="font-family-sans italic">16:30 - 17:00</time>
-            <div class="text-lg !font-bold">Open Gate</div>
+            <time class="font-family-sans italic text-black">16:30 - 17:00</time>
+            <div class="text-lg !font-bold text-black">Open Gate</div>
             <br />
             <br />
             <br />
@@ -49,8 +49,8 @@
             </svg>
           </div>
           <div class="timeline-end md:mb-10">
-            <time class="font-family-sans italic">17:00 - Maghrib</time>
-            <div class="text-lg !font-bold">Free Time</div>
+            <time class="font-family-sans italic text-black">17:00 - Maghrib</time>
+            <div class="text-lg !font-bold text-black">Free Time</div>
             <br />
             <br />
             <br />
@@ -74,8 +74,8 @@
             </svg>
           </div>
           <div class="timeline-start mb-10 md:text-end">
-            <time class="font-family-sans italic">Maghrib - Isya</time>
-            <div class="text-lg !font-bold">Buka Bersama</div>
+            <time class="font-family-sans italic text-black">Maghrib - Isya</time>
+            <div class="text-lg !font-bold text-black">Buka Bersama</div>
             <br />
             <br />
             <br />
@@ -99,9 +99,11 @@
             </svg>
           </div>
           <div class="timeline-end md:mb-10">
-            <time class="font-family-sans italic">Isya - Beres</time>
-            <div class="text-lg !font-bold">Game</div>
-            <br />
+            <time class="font-family-sans italic text-black">Isya - Beres</time>
+            <div class="text-lg !font-bold text-black">Main Event</div>
+            <p class="text-black opacity-65 italic font-family-sans">
+              Games, Doorprize, Music, and etc
+            </p>
             <br />
             <br />
           </div>
@@ -124,8 +126,8 @@
             </svg>
           </div>
           <div class="timeline-start mb-10 md:text-end">
-            <time class="font-family-sans italic">Gesan</time>
-            <div class="text-lg ont-family-sans !font-bold">Bubar</div>
+            <time class="font-family-sans italic text-black">Gesan</time>
+            <div class="text-lg ont-family-sans !font-bold text-black">Bubar</div>
             <br />
             <br />
             <br />

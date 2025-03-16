@@ -7,15 +7,15 @@
     </header>
 
     <div v-animate class="container mx-auto px-6 max-[400px]:pb-16">
-      <p class="text-lg font-family-sans text-center">
+      <p class="text-lg font-family-sans text-center text-black">
         Pembayaran dapat dilakukan melalui transfer ke rekening berikut:
       </p>
 
       <div v-animate class="mt-10">
-        <div class="text-lg font-family-sans text-center">
-          <p class="!font-bold">Bank Syariah Mandiri</p>
-          <p>1234 5678 9012 3456</p>
-          <p>a.n. <span class="!font-bold">SI ABC</span></p>
+        <div class="text-lg font-family-sans text-center text-black">
+          <p class="!font-bold text-black">Bank Central Asia / BCA</p>
+          <p>2311165641</p>
+          <p>a.n. <span class="!font-bold text-black">Yuliana</span></p>
         </div>
       </div>
 
@@ -25,13 +25,13 @@
         </p>
       </div>
 
-      <div v-animate class="pt-10">
+      <div v-animate class="pt-10 text-black">
         <p class="text-lg font-family-sans text-center">
           Konfirmasi pembayaran melalui WhatsApp ke nomor:
         </p>
 
         <div v-animate class="mt-5 text-lg font-family-sans text-center">
-          <p class="!font-bold">+62 812-3456-7890</p>
+          <p class="!font-bold">+62 895-2153-7284</p>
           <p>a.n. <span class="!font-bold">SI ABC</span></p>
           <p class="pb-2">Atau dapat klik tombol dibawah ini:</p>
           <ButtonPrimary text="Konfirmasi Pembayaran" @click="openGoogleMaps" />
@@ -46,7 +46,7 @@ import bgImage from '../assets/images/WP-WHITE.jpg'
 import ButtonPrimary from '@/components/ButtonPrimary.vue'
 
 const openGoogleMaps = () => {
-  const mapsUrl = 'https://maps.app.goo.gl/HsxejaS6316SRY8u9'
+  const mapsUrl = 'https://wa.link/zzrmpx'
   window.open(mapsUrl, '_blank') // Membuka link di tab baru
 }
 </script>

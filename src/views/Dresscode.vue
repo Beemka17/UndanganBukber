@@ -21,9 +21,9 @@
       :modules="modules"
       class="w-full h-[300px]"
     >
-      <swiper-slide><img :src="image1"></img></swiper-slide>
-      <swiper-slide><img :src="image2"></img></swiper-slide><swiper-slide><img :src="image3"></img></swiper-slide>
-      <swiper-slide><img :src="image4"></img></swiper-slide><swiper-slide><img :src="image5"></img></swiper-slide>
+      <swiper-slide><img :src="image1" loading="lazy"></img></swiper-slide>
+      <swiper-slide><img :src="image2" loading="lazy"></img></swiper-slide><swiper-slide><img :src="image3" loading="lazy"></img></swiper-slide>
+      <swiper-slide><img :src="image4" loading="lazy"></img></swiper-slide><swiper-slide><img :src="image5" loading="lazy"></img></swiper-slide>
     </swiper>
   </div>
 </div>

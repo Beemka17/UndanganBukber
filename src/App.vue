@@ -1,15 +1,26 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import { deviceDetector } from './deviceDetector'
 
 const router = useRouter()
-const isMobile = ref(window.innerWidth < 600)
+const isMobile = ref(true)
+
+// Fungsi untuk mendeteksi perubahan ukuran layar dan mode tampilan
+function handleResize() {
+  isMobile.value = deviceDetector.isMobileDevice()
+}
 
 // Cek ukuran layar saat pertama kali dimuat
 onMounted(() => {
   // Tambahkan event listener untuk mendeteksi perubahan ukuran layar
   window.addEventListener('resize', handleResize)
-  handleResize() // Panggil sekali saat pertama kali dimuat
+
+  // Deteksi mode desktop/mobile saat pertama kali dimuat
+  handleResize()
+
+  // Tambahkan pemeriksaan tambahan setelah page load
+  setTimeout(handleResize, 500)
 })
 
 // Hapus event listener saat komponen di-unmount
@@ -17,17 +28,18 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleResize)
 })
 
-// Fungsi untuk mendeteksi perubahan ukuran layar
-function handleResize() {
-  isMobile.value = window.innerWidth < 600
-}
-
 // Pantau perubahan `isMobile` secara real-time
 watch(isMobile, (newValue) => {
   if (newValue) {
-    router.push('/') // Kembali ke halaman utama jika di mobile
+    // Jika mobile, periksa apakah kita saat ini di halaman warning
+    if (router.currentRoute.value.path === '/warning') {
+      router.push('/') // Kembali ke halaman utama jika di mobile
+    }
   } else {
-    router.push('/warning') // Redirect ke warning jika di desktop
+    // Jika desktop, periksa apakah kita saat ini bukan di halaman warning
+    if (router.currentRoute.value.path !== '/warning') {
+      router.push('/warning') // Redirect ke warning jika di desktop
+    }
   }
 })
 </script>

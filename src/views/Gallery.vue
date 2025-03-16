@@ -8,11 +8,13 @@
 
     <div v-animate class="flex flex-col items-center pb-6">
       <fieldset class="fieldset pb-4">
-        <legend class="fieldset-legend font-family-sans">
+        <legend class="fieldset-legend font-family-sans text-black">
           Bagikan momen-mu di acara Tiba-tiba Bukber!
         </legend>
         <input type="file" @change="uploadImage" accept="image/*" class="file-input" />
-        <label class="fieldset-label">Max size 2MB (foto hanya dapat di-upload saat hari H)</label>
+        <label class="fieldset-label text-black"
+          >Max size 2MB (foto hanya dapat di-upload saat hari H)</label
+        >
       </fieldset>
       <button
         @click="submitUpload"

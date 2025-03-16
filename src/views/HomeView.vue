@@ -1,16 +1,17 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import Payment from '../views/Payment.vue'
+import { defineAsyncComponent } from 'vue'
+const Payment = defineAsyncComponent(() => import('../views/Payment.vue'))
 import Opening from './Opening.vue'
 import Landing from './Landing.vue'
 import Ornamen from '@/components/Ornamen.vue'
 import Rundown from './Rundown.vue'
 import Divider from '@/components/Divider.vue'
-import Tempat from './Tempat.vue'
-import Dresscode from './Dresscode.vue'
-import Gallery from './Gallery.vue'
-import Closing from './Closing.vue'
-import musik from '../assets/audio/backsong1.mp3'
+const Tempat = defineAsyncComponent(() => import('./Tempat.vue'))
+const Dresscode = defineAsyncComponent(() => import('./Dresscode.vue'))
+const Gallery = defineAsyncComponent(() => import('./Gallery.vue'))
+const Closing = defineAsyncComponent(() => import('./Closing.vue'))
+import musik from '../assets/audio/backsong.mp3'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faCompactDisc, faPlay, faPause } from '@fortawesome/free-solid-svg-icons'
@@ -24,12 +25,28 @@ const showLanding = ref(false) // Landing.vue belum muncul sampai Opening.vue se
 let audio = null
 let isMusicPlaying = false
 const isPlaying = ref(false)
+const isMobile = ref(window.innerWidth < 600)
 
 onMounted(() => {
   const params = new URLSearchParams(window.location.search)
   const nama = params.get('to')
   if (nama) {
     namaTamu.value = decodeURIComponent(nama)
+  }
+  window.addEventListener('resize', handleResize)
+  handleResize() // Panggil sekali saat pertama kali dimuat
+})
+
+function handleResize() {
+  isMobile.value = window.innerWidth < 600
+}
+
+// Pantau perubahan `isMobile` secara real-time
+watch(isMobile, (newValue) => {
+  if (newValue) {
+    router.push('/') // Kembali ke halaman utama jika di mobile
+  } else {
+    router.push('/warning') // Redirect ke warning jika di desktop
   }
 })
 
@@ -110,20 +127,20 @@ const toggleMusic = () => {
   <button
     v-if="!showOpening"
     @click="toggleMusic"
-    class="fixed bottom-6 right-6 w-14 h-14 bg-amber-400 shadow-lg rounded-full flex items-center justify-center z-10"
+    class="fixed bottom-6 right-6 w-14 h-14 shadow-lg rounded-full flex items-center justify-center z-10"
   >
     <div :class="{ 'animate-spin-slow': isPlaying }">
-      <FontAwesomeIcon :icon="['fas', 'compact-disc']" class="w-14 h-14 text-green-900" />
+      <FontAwesomeIcon :icon="['fas', 'compact-disc']" class="text-amber-400 text-7xl" />
     </div>
     <FontAwesomeIcon
       v-if="!isPlaying"
       :icon="['fas', 'play']"
-      class="absolute text-green-900 w-14 h-14"
+      class="absolute text-amber-400 text-xl"
     />
     <FontAwesomeIcon
       v-if="isPlaying"
       :icon="['fas', 'pause']"
-      class="absolute text-green-900 w-14 h-14"
+      class="absolute text-amber-400 text-xl"
     />
   </button>
 </template>

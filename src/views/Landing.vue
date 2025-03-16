@@ -9,26 +9,26 @@
       </h1>
       <p class="text-black text-center font-family-sans text-lg !font-medium pb-8">
         22 Maret 2025 <br />
-        16:00 - Selesai <br />
-        Cafe Anven, Cipaisain
+        16:30 - Selesai <br />
+        Cafe Anven, Cipaisan
       </p>
 
       <!-- Countdown Timer -->
       <div class="grid auto-cols-max grid-flow-col gap-5 text-center justify-center">
-        <div class="flex flex-col">
-          <span class="countdown font-family-sans text-5xl">{{ timeLeft.days }}</span>
+        <div class="flex flex-col text-black">
+          <span class="countdown font-family-sans text-5xl text-black">{{ timeLeft.days }}</span>
           days
         </div>
-        <div class="flex flex-col">
-          <span class="countdown font-family-sans text-5xl">{{ timeLeft.hours }}</span>
+        <div class="flex flex-col text-black">
+          <span class="countdown font-family-sans text-5xl text-black">{{ timeLeft.hours }}</span>
           hours
         </div>
-        <div class="flex flex-col">
-          <span class="countdown font-family-sans text-5xl">{{ timeLeft.minutes }}</span>
+        <div class="flex flex-col text-black">
+          <span class="countdown font-family-sans text-5xl text-black">{{ timeLeft.minutes }}</span>
           min
         </div>
-        <div class="flex flex-col">
-          <span class="countdown font-family-sans text-5xl">{{ timeLeft.seconds }}</span>
+        <div class="flex flex-col text-black">
+          <span class="countdown font-family-sans text-5xl text-black">{{ timeLeft.seconds }}</span>
           sec
         </div>
       </div>
@@ -44,7 +44,7 @@ const timeLeft = ref({ days: 0, hours: 0, minutes: 0, seconds: 0 })
 let countdownInterval = null
 
 const updateCountdown = () => {
-  const targetDate = new Date('March 22, 2025 16:00:00').getTime()
+  const targetDate = new Date('March 22, 2025 16:30:00').getTime()
   const now = new Date().getTime()
   const difference = targetDate - now
 
