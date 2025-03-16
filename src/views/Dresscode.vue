@@ -22,44 +22,34 @@
       class="w-full h-[300px]"
     >
       <swiper-slide><img :src="image1"></img></swiper-slide>
-      <swiper-slide><img :src="image2"></img></swiper-slide><swiper-slide><img :src="image3"></img></swiper-slide>
-      <swiper-slide><img :src="image4"></img></swiper-slide><swiper-slide><img :src="image5"></img></swiper-slide>
+      <swiper-slide><img :src="image2"></img></swiper-slide>
+      <swiper-slide><img :src="image3"></img></swiper-slide>
+      <swiper-slide><img :src="image4"></img></swiper-slide>
+      <swiper-slide><img :src="image5"></img></swiper-slide>
     </swiper>
   </div>
 </div>
 </template>
 
 <script setup>
-import bgImage from '../assets/images/WP-GREEN.jpg' // Sesuaikan path gambar
-import image1 from '../assets/images/batik1.jpg' // Sesuaikan path gambar
-import image2 from '../assets/images/batik2.jpg' // Sesuaikan path gambar
-import image3 from '../assets/images/batik3.jpg' // Sesuaikan path gambar
+import bgImage from '../assets/images/WP-GREEN.jpg'
+import image1 from '../assets/images/batik1.jpg'
+import image2 from '../assets/images/batik2.jpg'
+import image3 from '../assets/images/batik3.jpg'
 import image4 from '../assets/images/batik4.jpg'
 import image5 from '../assets/images/batik5.jpg'
-</script>
-<script>
+
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue'
 
 // Import Swiper styles
 import 'swiper/css'
-
 import 'swiper/css/pagination'
-
 import '../assets/dresscode.css'
 
-// import required modules
+// Import required modules
 import { Pagination } from 'swiper/modules'
 
-export default {
-  components: {
-    Swiper,
-    SwiperSlide,
-  },
-  setup() {
-    return {
-      modules: [Pagination],
-    }
-  },
-}
+// Define modules for swiper
+const modules = [Pagination]
 </script>
