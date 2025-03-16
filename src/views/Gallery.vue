@@ -95,8 +95,8 @@ import { createClient } from '@supabase/supabase-js'
 
 // Inisialisasi Supabase client (ganti dengan konfigurasi Anda)
 const supabaseUrl = ''
-const REMOVED = ''
-const supabase = createClient(supabaseUrl, REMOVED)
+const supabaseKey = ''
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // State untuk menyimpan data gambar
 const images = ref([])
