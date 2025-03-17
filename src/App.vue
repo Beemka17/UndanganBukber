@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { deviceDetector } from './deviceDetector'
+import { inject } from '@vercel/analytics'
 
 const router = useRouter()
 const isMobile = ref(true)
@@ -42,6 +43,7 @@ watch(isMobile, (newValue) => {
     }
   }
 })
+inject()
 </script>
 
 <template>
