@@ -90,7 +90,7 @@
             </div>
           </div>
 
-          <p>a.n. <span class="!font-bold">Yulinawati</span></p>
+          <p>a.n. <span class="!font-bold">Yulina</span></p>
           <p class="pb-2">Atau dapat klik tombol dibawah ini:</p>
           <ButtonPrimary text="Konfirmasi Pembayaran" @click="openWhatsApp" />
         </div>
