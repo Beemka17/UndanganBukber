@@ -94,8 +94,9 @@ import fallbackImage2 from '../assets/images/fallback2.jpg'
 import { createClient } from '@supabase/supabase-js'
 
 // Inisialisasi Supabase client (ganti dengan konfigurasi Anda)
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
+const supabaseUrl = 'https://avxvpygnekndpqmcqohl.supabase.co' //import.meta.env.VITE_SUPABASE_URL
+const supabaseKey =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2eHZweWduZWtuZHBxbWNxb2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4NzE3MDMsImV4cCI6MjA1NzQ0NzcwM30.88_v9MvtYBE4Uqoc6oE8hZAiVqBbQ1YTNcSj5LIwUbg' //import.meta.env.VITE_SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // State untuk menyimpan data gambar

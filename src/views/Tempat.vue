@@ -1,9 +1,14 @@
 <template>
   <div class="min-h-screen w-full" :style="{ backgroundImage: `url(${bgImage})` }">
-    <header v-animate class="pt-20 pb-20">
+    <header v-animate class="pt-20 pb-20 flex justify-center flex-col items-center">
       <h1 class="text-4xl font-family-serif text-amber-400 !font-bold text-center">
         Informasi <br />Lokasi
       </h1>
+      <div class="w-3/4 px-2 pt-2">
+        <p class="text-white text-lg font-family-sans text-center">
+          Biar <span class="italic">{{ namaTamu }}</span> ga salah tempat nantinya
+        </p>
+      </div>
     </header>
 
     <div v-animate class="w-full h-[350px] px-12">
@@ -44,6 +49,8 @@ import image3 from '../assets/images/ava-.png' // Sesuaikan path gambar
 import 'vue3-carousel/dist/carousel.css'
 import { Carousel, Slide, Navigation } from 'vue3-carousel'
 import ButtonPrimary from '@/components/ButtonPrimary.vue'
+import { inject } from 'vue'
+const namaTamu = inject('namaTamu', 'Tamu Undangan')
 
 const openGoogleMaps = () => {
   const mapsUrl = 'https://maps.app.goo.gl/HsxejaS6316SRY8u9'

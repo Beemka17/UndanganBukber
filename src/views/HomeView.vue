@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, provide } from 'vue'
 import Opening from './Opening.vue'
 import Landing from './Landing.vue'
 import Ornamen from '@/components/Ornamen.vue'
@@ -35,6 +35,8 @@ onMounted(() => {
   window.addEventListener('resize', handleResize)
   handleResize() // Panggil sekali saat pertama kali dimuat
 })
+
+provide('namaTamu', namaTamu)
 
 function handleResize() {
   isMobile.value = window.innerWidth < 600

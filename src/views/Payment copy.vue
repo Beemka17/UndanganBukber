@@ -64,9 +64,9 @@
           <!-- Styling seperti pada gambar npm -->
           <div class="flex justify-center py-2">
             <div
-              class="bg-gray-200 rounded-lg border border-gray-200 flex items-center justify-between px-4 py-2 w-64"
+              class="bg-gray-200 rounded-lg border border-gray-200 flex items-center justify-between px-4 py-2 w-72"
             >
-              <span class="text-gray-700">089521537284</span>
+              <span class="text-gray-700">+6289521537284</span>
               <button
                 @click="copyToClipboard('089521537284')"
                 class="bg-white border border-gray-200 rounded px-3 py-1 ml-2 flex items-center text-gray-700 hover:bg-gray-100"
@@ -105,12 +105,7 @@
       </div>
 
       <!-- Hidden textarea for fallback copy method -->
-      <textarea
-        ref="textAreaRef"
-        readonly
-        class="sr-only opacity-0 absolute -z-10"
-        aria-hidden="true"
-      ></textarea>
+      <textarea ref="textAreaRef" class="sr-only" aria-hidden="true"></textarea>
     </div>
   </div>
 </template>
@@ -129,70 +124,42 @@ const toastMessage = ref('')
 const textAreaRef = ref(null)
 
 const copyToClipboard = (text) => {
-  try {
-    // Prioritaskan menggunakan Clipboard API jika tersedia
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard
-        .writeText(text)
-        .then(() => {
-          showCopySuccess(text)
-        })
-        .catch((err) => {
-          console.error('Tidak dapat menyalin teks: ', err)
-          mobileSafeCopyToClipboard(text)
-        })
-    } else {
-      // Gunakan metode yang lebih mobile-friendly
-      mobileSafeCopyToClipboard(text)
-    }
-  } catch (err) {
-    console.error('Error saat menyalin teks: ', err)
+  // Checking if the Clipboard API is available
+  if (navigator.clipboard && window.isSecureContext) {
+    // Use the Clipboard API if available
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        showCopySuccess(text)
+      })
+      .catch((err) => {
+        console.error('Tidak dapat menyalin teks: ', err)
+        fallbackCopyToClipboard(text)
+      })
+  } else {
+    // Fallback for browsers that don't support the Clipboard API
+    fallbackCopyToClipboard(text)
   }
 }
 
-const mobileSafeCopyToClipboard = (text) => {
+const fallbackCopyToClipboard = (text) => {
   try {
+    // Use a hidden textarea element for the fallback method
     const textArea = textAreaRef.value
     textArea.value = text
-    textArea.setAttribute('readonly', 'readonly')
+    textArea.style.position = 'fixed'
+    textArea.style.left = '0'
+    textArea.style.top = '0'
+    textArea.style.opacity = '0'
+    textArea.focus()
+    textArea.select()
 
-    // Pada mobile, kita gunakan metode alternatif yang tidak memicu keyboard
-    // Hapus fokus dari elemen lain terlebih dahulu
-    document.activeElement.blur()
-
-    // Teknik yang lebih baik untuk mobile
-    if (navigator.userAgent.match(/ipad|iphone/i)) {
-      // Untuk iOS yang memiliki perilaku berbeda
-      textArea.contentEditable = true
-      textArea.readOnly = false
-
-      const range = document.createRange()
-      range.selectNodeContents(textArea)
-
-      const selection = window.getSelection()
-      selection.removeAllRanges()
-      selection.addRange(range)
-      textArea.setSelectionRange(0, 999999)
-    } else {
-      // Untuk Android dan browser lain
-      textArea.style.position = 'fixed'
-      textArea.style.left = '-9999px'
-      textArea.select()
-    }
-
-    // Eksekusi perintah copy
     const successful = document.execCommand('copy')
     if (successful) {
       showCopySuccess(text)
     } else {
-      console.warn('Fallback: Tidak dapat menyalin teks')
+      console.error('Fallback: Tidak dapat menyalin teks')
     }
-
-    // Setelah copy, segera hapus seleksi untuk menghindari keyboard muncul
-    window.getSelection().removeAllRanges()
-
-    // Set kembali fokus ke body untuk menghindari masalah pada mobile
-    document.body.focus()
   } catch (err) {
     console.error('Fallback: Tidak dapat menyalin teks', err)
   }

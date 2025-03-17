@@ -7,8 +7,8 @@
       <p class="text-slate-50 font-family-sans text-lg pb-5">Assalamu'alaikum,</p>
       <h1 class="text-4xl font-family-serif text-amber-400 font-black pb-5">{{ namaTamu }}</h1>
       <p class="text-slate-50 font-family-sans text-lg pb-5">
-        UB ngajak kamu untuk hadir dalam acara Buka Puasa Bersama yang penuh kebersamaan dan
-        kehangatan. Yuk, rayakan momen istimewa ini bersama kami!"
+        UNBREAKABLE ngajak kamu untuk hadir dalam acara Buka Puasa Bersama yang penuh kebersamaan
+        dan kehangatan. Yuk, rayakan momen istimewa ini bersama kami!
       </p>
       <ButtonPrimary text="Lihat Detail Acara" @click="$emit('close')"></ButtonPrimary>
     </section>
