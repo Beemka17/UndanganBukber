@@ -13,7 +13,9 @@
         </legend>
         <button
           @click="openCamera"
+          :disabled="isDisabled"
           class="btn-camera w-full mb-2 px-4 py-3 rounded-lg bg-amber-400 text-white font-medium text-center shadow-md"
+          :class="{ 'opacity-50 cursor-not-allowed': isDisabled }"
         >
           <span v-if="!isCameraOpen">Ambil Foto</span>
           <span v-else>Tutup Kamera</span>
@@ -133,16 +135,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount, onUnmounted } from 'vue'
 import bgImage from '../assets/images/WP-WHITE.jpg'
 import fallbackImage1 from '../assets/images/fallback1.jpg'
 import fallbackImage2 from '../assets/images/fallback2.jpg'
 import { createClient } from '@supabase/supabase-js'
 
 // Inisialisasi Supabase client
-const supabaseUrl = 'https://avxvpygnekndpqmcqohl.supabase.co'
-const supabaseKey =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2eHZweWduZWtuZHBxbWNxb2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4NzE3MDMsImV4cCI6MjA1NzQ0NzcwM30.88_v9MvtYBE4Uqoc6oE8hZAiVqBbQ1YTNcSj5LIwUbg'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // State untuk kamera
@@ -160,6 +161,11 @@ const error = ref(null)
 const isUploading = ref(false)
 const uploadSuccess = ref(false)
 const uploadError = ref(null)
+const photoCount = ref(0)
+const maxPhotos = 200
+const isDisabled = ref(false)
+const unlockTime = new Date('2025-03-22T16:30:00').getTime()
+//const unlockTime = new Date().getTime() + 10000
 
 // Fungsi untuk membuka/menutup kamera
 const openCamera = async () => {
@@ -264,6 +270,7 @@ const retakePhoto = () => {
 
 // Fungsi untuk mengupload foto yang diambil
 const submitUpload = async () => {
+  if (isDisabled.value) return
   if (!capturedImage.value) {
     uploadError.value = 'Silakan ambil foto terlebih dahulu'
     return
@@ -290,7 +297,7 @@ const submitUpload = async () => {
     const imageFile = new File([blob], fileName, { type: 'image/jpeg' })
 
     // Upload to Supabase
-    const { data, error } = await supabase.storage.from('test').upload(fileName, imageFile)
+    const { data, error } = await supabase.storage.from('gallery').upload(fileName, imageFile)
 
     if (error) {
       throw error
@@ -300,6 +307,7 @@ const submitUpload = async () => {
     capturedImage.value = null
     closeCamera()
     uploadSuccess.value = true
+    fetchPhotoCount()
 
     // Refresh gallery dengan gambar baru
     await fetchGalleryImages()
@@ -311,6 +319,35 @@ const submitUpload = async () => {
   }
 }
 
+// Cek apakah waktu sudah mencapai batas & jumlah foto masih kurang dari 200
+const checkButtonStatus = () => {
+  const now = new Date().getTime()
+
+  if (now >= unlockTime && photoCount.value < maxPhotos) {
+    isDisabled.value = false // Aktifkan tombol setelah waktu berlalu
+  } else {
+    isDisabled.value = true // Tetap nonaktif sebelum waktunya
+  }
+}
+
+// Fungsi untuk mendapatkan jumlah foto di storage
+const fetchPhotoCount = async () => {
+  const { data, error } = await supabase.storage
+    .from('gallery') // Ganti dengan nama bucket Anda
+    .list('')
+
+  if (error) {
+    console.error('Error fetching files:', error)
+    return
+  }
+
+  photoCount.value = data.length
+  // Cek apakah tombol harus tetap disabled
+  checkButtonStatus()
+  console.log(`Jumlah foto saat ini di Supabase: ${photoCount.value}`)
+  //isDisabled.value = photoCount.value >= maxPhotos
+}
+
 // Fungsi untuk mendapatkan gambar dari Supabase Storage - FIXED to sort by most recent
 const fetchGalleryImages = async () => {
   try {
@@ -318,7 +355,7 @@ const fetchGalleryImages = async () => {
     error.value = null
 
     // Get all files from the 'gallery' bucket
-    const { data, error: storageError } = await supabase.storage.from('test').list('', {
+    const { data, error: storageError } = await supabase.storage.from('gallery').list('', {
       sortBy: { column: 'created_at', order: 'desc' }, // Sort by newest first
       limit: 100, // Increase limit to get more images
     })
@@ -333,7 +370,7 @@ const fetchGalleryImages = async () => {
     const imageUrls = imageFiles.map((file, index) => ({
       id: `${file.name}-${index}`, // Create a unique ID using filename and index
       name: file.name,
-      url: `${supabaseUrl}/storage/v1/object/public/test/${file.name}`,
+      url: `${supabaseUrl}/storage/v1/object/public/gallery/${file.name}`,
       created_at: file.created_at || Date.now(), // Use created_at for sorting
     }))
 
@@ -394,9 +431,22 @@ onBeforeUnmount(() => {
   closeCamera()
 })
 
+let intervalId
 // Fetch images on component mount
 onMounted(() => {
+  fetchPhotoCount()
+  checkButtonStatus()
   fetchGalleryImages()
+  intervalId = setInterval(fetchGalleryImages, 60000)
+  // Cek waktu setiap detik
+  setInterval(() => {
+    checkButtonStatus()
+  }, 1000)
+})
+
+// Hentikan polling jika komponen di-unmount
+onUnmounted(() => {
+  clearInterval(intervalId)
 })
 </script>
 
