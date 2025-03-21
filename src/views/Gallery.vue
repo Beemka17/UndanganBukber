@@ -1,54 +1,95 @@
 <template>
   <div class="min-h-fit w-full" :style="{ backgroundImage: `url(${bgImage})` }">
-    <header v-animate class="pt-20 pb-20">
+    <header v-animate class="pt-16 pb-12">
       <h1 class="text-4xl font-family-serif text-amber-400 !font-bold text-center">
         Gallery <br />Acara
       </h1>
     </header>
 
-    <div v-animate class="flex flex-col items-center pb-6">
-      <fieldset class="fieldset pb-4">
+    <div v-animate class="flex flex-col items-center pb-6 px-4">
+      <fieldset class="fieldset pb-4 w-full max-w-xs">
         <legend class="fieldset-legend font-family-sans text-black">
           Bagikan momen-mu di acara Tiba-tiba Bukber!
         </legend>
-        <input type="file" @change="uploadImage" accept="image/*" class="file-input" />
-        <label class="fieldset-label text-black"
+        <button
+          @click="openCamera"
+          class="btn-camera w-full mb-2 px-4 py-3 rounded-lg bg-amber-400 text-white font-medium text-center shadow-md"
+        >
+          <span v-if="!isCameraOpen">Ambil Foto</span>
+          <span v-else>Tutup Kamera</span>
+        </button>
+        <label class="fieldset-label text-black text-sm"
           >Max size 2MB (foto hanya dapat di-upload saat hari H)</label
         >
       </fieldset>
-      <button
-        @click="submitUpload"
-        class="btn px-4 py-2 rounded shadow btn-disabled"
-        tabindex="-1"
-        role="button"
-        aria-disabled="true"
-      >
-        Upload Foto
-      </button>
+
+      <!-- Status Messages -->
+      <div v-if="uploadSuccess" class="upload-success text-green-500 mt-2 text-center">
+        Foto berhasil diupload!
+      </div>
+      <div v-if="uploadError" class="upload-error text-red-500 mt-2 text-center">
+        {{ uploadError }}
+      </div>
     </div>
 
-    <div v-animate class="relative w-full h-96 overflow-hidden">
+    <!-- Mobile-optimized Camera Modal -->
+    <div v-if="isCameraOpen" class="mobile-camera-modal">
+      <div class="mobile-camera-container">
+        <div class="camera-header">
+          <button @click="closeCamera" class="close-btn">✕</button>
+        </div>
+
+        <div class="camera-view-container">
+          <video ref="videoElement" autoplay playsinline class="camera-view"></video>
+          <canvas ref="canvasElement" class="hidden"></canvas>
+        </div>
+
+        <div v-if="!capturedImage" class="camera-controls">
+          <button @click="capturePhoto" class="capture-btn">
+            <div class="inner-circle"></div>
+          </button>
+        </div>
+
+        <div v-if="capturedImage" class="preview-section">
+          <img :src="capturedImage" class="preview-image" />
+          <div class="preview-actions">
+            <button @click="retakePhoto" class="action-btn retake-btn">Ambil Ulang</button>
+            <button @click="submitUpload" class="action-btn upload-btn" :disabled="isUploading">
+              {{ isUploading ? 'Mengupload...' : 'Upload' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fixed Gallery Section with continuous scrolling -->
+    <div v-animate class="relative w-full h-120 min-h-96 overflow-hidden">
+      <!-- Loading indicator -->
+      <div v-if="isLoading" class="flex justify-center items-center h-full">
+        <div class="spinner"></div>
+      </div>
+
       <!-- Container untuk animasi scroll dengan masonry grid -->
-      <div class="scroll-container">
+      <div v-else class="scroll-container">
         <!-- Kelompok pertama (original) -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 px-4 masonry-group">
           <div class="grid gap-4">
-            <div v-for="img in gridData.col1" :key="`first-col1-${img.id}`">
+            <div v-for="img in gridData.col1" :key="`first-col1-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
           <div class="grid gap-4">
-            <div v-for="img in gridData.col2" :key="`first-col2-${img.id}`">
+            <div v-for="img in gridData.col2" :key="`first-col2-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
           <div class="grid gap-4 hidden md:block">
-            <div v-for="img in gridData.col3" :key="`first-col3-${img.id}`">
+            <div v-for="img in gridData.col3" :key="`first-col3-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
           <div class="grid gap-4 hidden md:block">
-            <div v-for="img in gridData.col4" :key="`first-col4-${img.id}`">
+            <div v-for="img in gridData.col4" :key="`first-col4-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
@@ -57,26 +98,31 @@
         <!-- Kelompok kedua (duplikat) untuk scroll mulus -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 px-4 masonry-group">
           <div class="grid gap-4">
-            <div v-for="img in gridData.col1" :key="`second-col1-${img.id}`">
+            <div v-for="img in gridData.col1" :key="`second-col1-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
           <div class="grid gap-4">
-            <div v-for="img in gridData.col2" :key="`second-col2-${img.id}`">
+            <div v-for="img in gridData.col2" :key="`second-col2-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
           <div class="grid gap-4 hidden md:block">
-            <div v-for="img in gridData.col3" :key="`second-col3-${img.id}`">
+            <div v-for="img in gridData.col3" :key="`second-col3-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
           <div class="grid gap-4 hidden md:block">
-            <div v-for="img in gridData.col4" :key="`second-col4-${img.id}`">
+            <div v-for="img in gridData.col4" :key="`second-col4-${img.id}`" class="gallery-item">
               <img class="h-auto max-w-full rounded-lg" :src="img.url" :alt="`Image ${img.id}`" />
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- No images message -->
+      <div v-if="!isLoading && images.length === 0" class="text-center py-12 text-gray-500">
+        Belum ada foto yang diupload.
       </div>
 
       <!-- Overlay gradients untuk efek fade dengan warna putih -->
@@ -87,42 +133,139 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
 import bgImage from '../assets/images/WP-WHITE.jpg'
 import fallbackImage1 from '../assets/images/fallback1.jpg'
 import fallbackImage2 from '../assets/images/fallback2.jpg'
 import { createClient } from '@supabase/supabase-js'
 
-// Inisialisasi Supabase client (ganti dengan konfigurasi Anda)
-const supabaseUrl = 'https://avxvpygnekndpqmcqohl.supabase.co' //import.meta.env.VITE_SUPABASE_URL
+// Inisialisasi Supabase client
+const supabaseUrl = 'https://avxvpygnekndpqmcqohl.supabase.co'
 const supabaseKey =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2eHZweWduZWtuZHBxbWNxb2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4NzE3MDMsImV4cCI6MjA1NzQ0NzcwM30.88_v9MvtYBE4Uqoc6oE8hZAiVqBbQ1YTNcSj5LIwUbg' //import.meta.env.VITE_SUPABASE_KEY
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF2eHZweWduZWtuZHBxbWNxb2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDE4NzE3MDMsImV4cCI6MjA1NzQ0NzcwM30.88_v9MvtYBE4Uqoc6oE8hZAiVqBbQ1YTNcSj5LIwUbg'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
-// State untuk menyimpan data gambar
+// State untuk kamera
+const isCameraOpen = ref(false)
+const videoElement = ref(null)
+const canvasElement = ref(null)
+const capturedImage = ref(null)
+const stream = ref(null)
+const hasCameraPermission = ref(false)
+
+// State untuk galeri dan upload
 const images = ref([])
 const isLoading = ref(true)
 const error = ref(null)
-const selectedFile = ref(null)
 const isUploading = ref(false)
 const uploadSuccess = ref(false)
 const uploadError = ref(null)
 
-const uploadImage = (event) => {
-  selectedFile.value = event.target.files[0]
-  uploadError.value = null
-  uploadSuccess.value = false
-}
-
-const submitUpload = async () => {
-  if (!selectedFile.value) {
-    uploadError.value = 'Silakan pilih file terlebih dahulu'
+// Fungsi untuk membuka/menutup kamera
+const openCamera = async () => {
+  if (isCameraOpen.value) {
+    closeCamera()
     return
   }
 
-  // Validasi ukuran file (max 2MB)
-  if (selectedFile.value.size > 2 * 1024 * 1024) {
-    uploadError.value = 'Ukuran file melebihi 2MB'
+  try {
+    uploadError.value = null
+    uploadSuccess.value = false
+    capturedImage.value = null
+
+    // Set camera flag first to show modal immediately
+    isCameraOpen.value = true
+
+    // Timeout to ensure DOM is updated before accessing video element
+    setTimeout(async () => {
+      try {
+        // Meminta izin kamera dengan constraints khusus mobile
+        const constraints = {
+          video: {
+            facingMode: 'environment', // Gunakan kamera belakang
+            width: { ideal: 1280 },
+            height: { ideal: 720 },
+          },
+          audio: false,
+        }
+
+        stream.value = await navigator.mediaDevices.getUserMedia(constraints)
+        hasCameraPermission.value = true
+
+        // Menghubungkan stream ke elemen video
+        if (videoElement.value) {
+          videoElement.value.srcObject = stream.value
+          videoElement.value.onloadedmetadata = () => {
+            videoElement.value.play()
+          }
+        }
+      } catch (err) {
+        console.error('Error accessing camera:', err)
+        uploadError.value = 'Tidak dapat mengakses kamera. Pastikan Anda telah memberikan izin.'
+        // Keep modal open to display the error
+      }
+    }, 100)
+  } catch (err) {
+    console.error('Error in openCamera:', err)
+    uploadError.value = 'Terjadi kesalahan saat mencoba mengakses kamera.'
+    isCameraOpen.value = false
+  }
+}
+
+// Fungsi untuk menutup kamera
+const closeCamera = () => {
+  if (stream.value) {
+    stream.value.getTracks().forEach((track) => track.stop())
+    stream.value = null
+  }
+
+  if (videoElement.value) {
+    videoElement.value.srcObject = null
+  }
+
+  isCameraOpen.value = false
+  capturedImage.value = null
+  hasCameraPermission.value = false
+}
+
+// Fungsi untuk mengambil foto
+const capturePhoto = () => {
+  if (!videoElement.value || !canvasElement.value) return
+
+  const video = videoElement.value
+  const canvas = canvasElement.value
+
+  // Sesuaikan ukuran canvas dengan ukuran video
+  canvas.width = video.videoWidth
+  canvas.height = video.videoHeight
+
+  // Gambar frame video ke canvas
+  const context = canvas.getContext('2d')
+  context.drawImage(video, 0, 0, canvas.width, canvas.height)
+
+  // Konversi ke data URL, kompres untuk mobile
+  capturedImage.value = canvas.toDataURL('image/jpeg', 0.8) // 80% quality for mobile
+
+  // Bisa stop video sementara saat preview
+  if (stream.value) {
+    stream.value.getVideoTracks().forEach((track) => (track.enabled = false))
+  }
+}
+
+// Fungsi untuk mengambil ulang foto
+const retakePhoto = () => {
+  capturedImage.value = null
+
+  // Aktifkan kembali video track
+  if (stream.value) {
+    stream.value.getVideoTracks().forEach((track) => (track.enabled = true))
+  }
+}
+
+// Fungsi untuk mengupload foto yang diambil
+const submitUpload = async () => {
+  if (!capturedImage.value) {
+    uploadError.value = 'Silakan ambil foto terlebih dahulu'
     return
   }
 
@@ -130,17 +273,32 @@ const submitUpload = async () => {
     isUploading.value = true
     uploadError.value = null
 
-    const fileName = `${Date.now()}-${selectedFile.value.name}`
-    const { data, error } = await supabase.storage
-      .from('gallery')
-      .upload(fileName, selectedFile.value)
+    // Convert data URL to Blob
+    const response = await fetch(capturedImage.value)
+    const blob = await response.blob()
+
+    // Check file size (max 2MB)
+    if (blob.size > 2 * 1024 * 1024) {
+      uploadError.value =
+        'Ukuran foto melebihi 2MB. Silakan ambil ulang dengan resolusi lebih rendah.'
+      isUploading.value = false
+      return
+    }
+
+    // Create a file from the blob
+    const fileName = `camera-${Date.now()}.jpg`
+    const imageFile = new File([blob], fileName, { type: 'image/jpeg' })
+
+    // Upload to Supabase
+    const { data, error } = await supabase.storage.from('test').upload(fileName, imageFile)
 
     if (error) {
       throw error
     }
 
-    // Reset form setelah upload berhasil
-    selectedFile.value = null
+    // Reset state setelah upload berhasil
+    capturedImage.value = null
+    closeCamera()
     uploadSuccess.value = true
 
     // Refresh gallery dengan gambar baru
@@ -153,108 +311,110 @@ const submitUpload = async () => {
   }
 }
 
-// Fungsi untuk mengacak array
-const shuffleArray = (array) => {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
-}
-
-// Fungsi untuk mendapatkan gambar dari Supabase Storage
+// Fungsi untuk mendapatkan gambar dari Supabase Storage - FIXED to sort by most recent
 const fetchGalleryImages = async () => {
   try {
     isLoading.value = true
+    error.value = null
 
-    const { data, error: storageError } = await supabase.storage.from('gallery').list('', {
-      sortBy: { column: 'created_at', order: 'desc' },
+    // Get all files from the 'gallery' bucket
+    const { data, error: storageError } = await supabase.storage.from('test').list('', {
+      sortBy: { column: 'created_at', order: 'desc' }, // Sort by newest first
+      limit: 100, // Increase limit to get more images
     })
+    console.log('Fetched images:', data)
 
     if (storageError) throw storageError
 
+    // Filter to keep only image files
     const imageFiles = data.filter((file) => file.name.match(/\.(jpg|jpeg|png|gif|webp)$/i))
 
+    // Map to create image objects with public URLs
     const imageUrls = imageFiles.map((file, index) => ({
-      id: index + 1,
+      id: `${file.name}-${index}`, // Create a unique ID using filename and index
       name: file.name,
-      url: `${supabaseUrl}/storage/v1/object/public/gallery/${file.name}`,
-      size: file.metadata?.size || 0,
+      url: `${supabaseUrl}/storage/v1/object/public/test/${file.name}`,
+      created_at: file.created_at || Date.now(), // Use created_at for sorting
     }))
 
-    images.value = shuffleArray(imageUrls)
+    // Sort by newest first if created_at is available
+    images.value = imageUrls.sort((a, b) => {
+      if (a.created_at && b.created_at) {
+        return new Date(b.created_at) - new Date(a.created_at)
+      }
+      return 0
+    })
 
+    // Use fallback images only if no images found
     if (images.value.length === 0) {
-      console.warn('Tidak ada gambar dari Supabase. Menggunakan dua gambar lokal sebagai fallback.')
+      console.warn('Tidak ada gambar dari Supabase. Menggunakan gambar lokal sebagai fallback.')
       images.value = getFallbackImages()
     }
+
     isLoading.value = false
   } catch (err) {
+    console.error('Error fetching images:', err)
     error.value = err.message
     isLoading.value = false
-    console.error('Error fetching images:', err)
 
+    // Only use fallback if there was an error
     images.value = getFallbackImages()
   }
 }
 
-// Fungsi untuk mendapatkan satu gambar fallback dari lokal
+// Fungsi untuk mendapatkan gambar fallback dari lokal
 const getFallbackImages = () => {
   return [
-    { id: 998, url: fallbackImage1 },
-    { id: 999, url: fallbackImage2 },
+    { id: 'fallback-1', name: 'fallback1.jpg', url: fallbackImage1 },
+    { id: 'fallback-2', name: 'fallback2.jpg', url: fallbackImage2 },
   ]
 }
 
-// Fungsi untuk mendapatkan gambar demo (fallback)
-const getDemoImages = () => {
-  const demoImages = [
-    { id: 1, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image.jpg' },
-    { id: 2, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-1.jpg' },
-    { id: 3, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-2.jpg' },
-    { id: 4, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-3.jpg' },
-    { id: 5, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-4.jpg' },
-    { id: 6, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-5.jpg' },
-    { id: 7, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-6.jpg' },
-    { id: 8, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-7.jpg' },
-    { id: 9, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-8.jpg' },
-    { id: 10, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-9.jpg' },
-    { id: 11, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-10.jpg' },
-    { id: 12, url: 'https://flowbite.s3.amazonaws.com/docs/gallery/masonry/image-11.jpg' },
-  ]
-  return shuffleArray(demoImages)
-}
-
-// Computed property untuk mendistribusikan gambar ke grid masonry
+// Computed property untuk mendistribusikan gambar ke grid masonry - FIXED to distribute properly
 const gridData = computed(() => {
   const cols = { col1: [], col2: [], col3: [], col4: [] }
 
   if (images.value.length === 0) return cols
 
-  // Distribute images evenly across columns
   images.value.forEach((img, index) => {
-    const colIndex = index % 4
-    if (colIndex === 0) cols.col1.push(img)
-    else if (colIndex === 1) cols.col2.push(img)
-    else if (colIndex === 2) cols.col3.push(img)
-    else cols.col4.push(img)
+    const colIndex = index % 2
+    if (colIndex === 0) {
+      cols.col1.push(img)
+    } else if (colIndex) {
+      cols.col2.push(img)
+    }
   })
 
+  console.log('Distributed columns:', cols) // Tambahkan log ini
   return cols
+})
+
+// Pastikan untuk menutup kamera dan membersihkan stream saat komponen unmount
+onBeforeUnmount(() => {
+  closeCamera()
 })
 
 // Fetch images on component mount
 onMounted(() => {
-  fetchGalleryImages() // Rename from fetchImages to fetchGalleryImages for consistency
+  fetchGalleryImages()
 })
 </script>
 
 <style>
+/* Styling for gallery items with better aspect ratio handling */
+.gallery-item {
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+}
+
+/* Better scroll container with responsive height */
 .scroll-container {
   width: 100%;
   position: absolute;
-  animation: scrollUp 40s linear infinite;
+  animation: scrollUp 20s linear infinite;
 }
 
 .masonry-group {
@@ -268,11 +428,30 @@ onMounted(() => {
     transform: translateY(0);
   }
   100% {
-    transform: translateY(-50%); /* Hanya pindah setengah dari container */
+    transform: translateY(-50%);
   }
 }
 
-/* Gradients untuk efek fade in/out dengan warna putih */
+/* Loading spinner */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border-left-color: #f59e0b;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gradients untuk efek fade */
 .fade-overlay-top {
   position: absolute;
   top: 0;
@@ -293,5 +472,153 @@ onMounted(() => {
   background: linear-gradient(to top, rgba(249, 249, 249, 1) 0%, rgba(249, 249, 249, 0) 100%);
   z-index: 10;
   pointer-events: none;
+}
+
+/* Mobile Camera UI Styling */
+.mobile-camera-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mobile-camera-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.camera-header {
+  padding: 12px;
+  display: flex;
+  justify-content: flex-end;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.close-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+}
+
+.camera-view-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.camera-view {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.camera-controls {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.capture-btn {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  border: 3px solid white;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inner-circle {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: white;
+}
+
+.preview-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.preview-image {
+  flex: 1;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background-color: #000;
+}
+
+.preview-actions {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.action-btn {
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-weight: medium;
+  border: none;
+}
+
+.retake-btn {
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white;
+}
+
+.upload-btn {
+  background-color: #f59e0b; /* amber-500 */
+  color: white;
+}
+
+.upload-btn:disabled {
+  opacity: 0.7;
+}
+
+.hidden {
+  display: none;
+}
+
+/* Ensuring modal works well on iOS */
+.camera-view {
+  -webkit-transform: scaleX(1);
+  transform: scaleX(1);
+}
+
+/* Additional mobile-specific adjustments */
+@media (max-width: 640px) {
+  .camera-view {
+    width: 100%;
+    height: 100%;
+  }
+
+  .preview-image {
+    max-height: calc(100vh - 130px);
+  }
 }
 </style>
